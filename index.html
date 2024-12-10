@@ -118,6 +118,7 @@
         <div class="form-group">
             <label for="ddd">Escolha o DDD:</label>
             <select id="ddd" name="ddd" class="select-field">
+                <option value="51" selected>51 - Porto Alegre (RS)</option>
                 <option value="11">11 - São Paulo (SP)</option>
                 <option value="12">12 - São Paulo (SP)</option>
                 <option value="13">13 - São Paulo (SP)</option>
@@ -148,7 +149,6 @@
                 <option value="47">47 - Santa Catarina (SC)</option>
                 <option value="48">48 - Santa Catarina (SC)</option>
                 <option value="49">49 - Santa Catarina (SC)</option>
-                <option value="51">51 - Porto Alegre (RS)</option>
                 <option value="53">53 - Rio Grande do Sul (RS)</option>
                 <option value="54">54 - Rio Grande do Sul (RS)</option>
                 <option value="55">55 - Rio Grande do Sul (RS)</option>
@@ -190,46 +190,52 @@
         </div>
         <div class="form-group">
             <label for="restante">Restante do número de telefone:</label>
-                       <input type="tel" id="restante" name="restante" class="input-field" placeholder="Ex: 912345678" required />
+            <input type="tel" id="restante" name="restante" class="input-field" placeholder="Ex: 912345678" pattern="[0-9]{8,9}" required />
         </div>
         <div class="form-group">
-            <label for="mensagem">Mensagem (opcional):</label>
-            <textarea id="mensagem" name="mensagem" class="textarea-field" rows="4" placeholder="Digite sua mensagem aqui (opcional)"></textarea>
+            <label for="mensagem">Mensagem:</label>
+            <textarea id="mensagem" name="mensagem" class="textarea-field" rows="4" placeholder="Digite sua mensagem aqui..." required></textarea>
         </div>
-        <div class="form-group">
-            <button class="button" id="whatsappButton">
-                <i class="fab fa-whatsapp icon"></i> Enviar mensagem
-            </button>
-        </div>
+        <button class="button" onclick="enviarMensagemWhatsApp()">
+            <i class="fab fa-whatsapp icon"></i>Enviar mensagem pelo WhatsApp
+        </button>
     </div>
-
     <script>
-        document.getElementById('whatsappButton').addEventListener('click', function(event) {
-            event.preventDefault();
+        function enviarMensagemWhatsApp() {
+            const ddd = document.getElementById("ddd").value.trim();
+            const codigoBrasil = "+55";
+            const restante = document.getElementById("restante").value.trim();
+            const mensagem = document.getElementById("mensagem").value.trim();
 
-            // Obter os valores dos campos
-            var ddd = document.getElementById('ddd').value;
-            var restante = document.getElementById('restante').value.trim();
-            var mensagem = document.getElementById('mensagem').value.trim();
-
-            // Validar se o número foi preenchido
-            if (restante === '') {
-                alert('Por favor, insira o número de telefone!');
+            if (restante === "" || mensagem === "") {
+                alert("Por favor, preencha todos os campos.");
                 return;
             }
 
-            // URL base do WhatsApp
-            var url = 'https://wa.me/' + ddd + restante;
-
-            // Se uma mensagem for fornecida, adicionar a mensagem à URL
-            if (mensagem) {
-                url += '?text=' + encodeURIComponent(mensagem);
+            if (!/^[0-9]{8,9}$/.test(restante)) {
+                alert("Por favor, insira um número de telefone válido (8 ou 9 dígitos).");
+                return;
             }
 
-            // Abrir o link do WhatsApp
-            window.open(url, '_blank');
+            const urlWhatsApp = `https://api.whatsapp.com/send?phone=${codigoBrasil}${ddd}${restante}&text=${encodeURIComponent(mensagem)}`;
+
+            // Abre o link do WhatsApp sem confirmação
+            window.open(urlWhatsApp, '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.input-field, .textarea-field, .select-field');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.classList.add('active');
+                });
+                input.addEventListener('blur', () => {
+                    if (input.value === '') {
+                        input.parentElement.classList.remove('active');
+                    }
+                });
+            });
         });
     </script>
 </body>
 </html>
-
